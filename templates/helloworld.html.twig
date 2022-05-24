@@ -1,0 +1,61 @@
+<h1 style="font-style:italic;">{{ my_var|upper }}</h1>
+{% if times > 0 %}
+    {% apply upper %} A Varible is : {% endapply %} {{ times }}
+{% endif %}
+
+{% for i in 0.. times %}
+    {% if(i == 0) %} <hr> {% endif %}
+    <br>{{ i }}
+{% endfor %}
+<hr>
+
+{% apply escape %}
+    Everything will be automatically escaped in this <b>block</b>
+    using the HTML <script> alert('test') </script> strategy
+{% endapply %}
+
+{# {% set foo = 'xyz' %} #}
+{% set foo = [{'abc': '<b>001</b>'},{'pqr': '002'},{'xyz ': '003'}] %}
+
+{# context #}
+{% for key,user in foo  %}
+     <br>{{ user | json_encode(constant('JSON_PRETTY_PRINT')) }}<==
+      {{ key }}
+{% else %}
+      <br>--x-- No Data in Array --x--</br>
+{% endfor %}
+
+{# Twig Macro #}
+{% import "form.html.twig" as forms %}
+
+<p>Username : {{ forms.input('username') }}</p>
+<p>Email Id : {{ forms.input('emmail_id','','email','10') }}
+<p>Password : {{ forms.input('password', null, 'password') }}</p>
+<p>{{ forms.textarea('comment') }}</p>
+
+<br>=====<br>
+{% set mfoo = -42.2 %}
+{% with %}
+    {% set mfoo = 2 %}
+    {{ mfoo }} {# foo is 42 here #}
+{% endwith %}
+
+<br>{{ mfoo | abs }}
+
+<br>=====<br>
+{% set items = ['a', 'b', 'c', 'd','e'] %}
+<table border="1">
+{% for row in items|batch(2, 'No item',false) %}
+  {{ row | json_encode }}<br>---<br>
+  <tr>
+    {% for column in row %}
+        <td>{{ column }}</td>
+    {% endfor %}
+  </tr>
+{% endfor %}
+</table>
+
+<br>=====<br>
+{% set items = [{ 'fruit' : 'apple'}, {'orange': 'fruit' }, {'fruit': 'dragon' }] %}
+{% set fruits = items|column('fruit') %}
+{{ fruits | json_encode }}
