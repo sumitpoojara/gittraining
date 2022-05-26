@@ -3,59 +3,152 @@
     {% apply upper %} A Varible is : {% endapply %} {{ times }}
 {% endif %}
 
-{% for i in 0.. times %}
-    {% if(i == 0) %} <hr> {% endif %}
-    <br>{{ i }}
-{% endfor %}
-<hr>
+{% if show_all == 'yes' %}
 
-{% apply escape %}
-    Everything will be automatically escaped in this <b>block</b>
-    using the HTML <script> alert('test') </script> strategy
-{% endapply %}
+  {% for i in 0.. times %}
+      {% if(i == 0) %} <hr> {% endif %}
+      <br>{{ i }}
+  {% endfor %}
+  <hr>
 
-{# {% set foo = 'xyz' %} #}
-{% set foo = [{'abc': '<b>001</b>'},{'pqr': '002'},{'xyz ': '003'}] %}
+  {% apply escape %}
+      Everything will be automatically escaped in this <b>block</b>
+      using the HTML <script> alert('test') </script> strategy
+  {% endapply %}
 
-{# context #}
-{% for key,user in foo  %}
-     <br>{{ user | json_encode(constant('JSON_PRETTY_PRINT')) }}<==
-      {{ key }}
-{% else %}
-      <br>--x-- No Data in Array --x--</br>
-{% endfor %}
+  {# {% set foo = 'xyz' %} #}
+  {% set foo = [{'abc': '<b>001</b>'},{'pqr': '002'},{'xyz ': '003'}] %}
 
-{# Twig Macro #}
-{% import "form.html.twig" as forms %}
+  {# context #}
+  {% for key,user in foo  %}
+       <br>{{ user | json_encode(constant('JSON_PRETTY_PRINT')) }}<==
+        {{ key }}
+  {% else %}
+        <br>--x-- No Data in Array --x--</br>
+  {% endfor %}
 
-<p>Username : {{ forms.input('username') }}</p>
-<p>Email Id : {{ forms.input('emmail_id','','email','10') }}
-<p>Password : {{ forms.input('password', null, 'password') }}</p>
-<p>{{ forms.textarea('comment') }}</p>
+  {# Twig Macro #}
+  {% import "form.html.twig" as forms %}
 
-<br>=====<br>
-{% set mfoo = -42.2 %}
-{% with %}
-    {% set mfoo = 2 %}
-    {{ mfoo }} {# foo is 42 here #}
-{% endwith %}
+  <p>Username : {{ forms.input('username') }}</p>
+  <p>Email Id : {{ forms.input('emmail_id','','email','10') }}
+  <p>Password : {{ forms.input('password', null, 'password') }}</p>
+  <p>{{ forms.textarea('comment') }}</p>
 
-<br>{{ mfoo | abs }}
+  <br>=====<br>
+  {% set mfoo = -42.2 %}
+  {% with %}
+      {% set mfoo = 2 %}
+      {{ mfoo }} {# foo is 42 here #}
+  {% endwith %}
 
-<br>=====<br>
-{% set items = ['a', 'b', 'c', 'd','e'] %}
-<table border="1">
-{% for row in items|batch(2, 'No item',false) %}
-  {{ row | json_encode }}<br>---<br>
-  <tr>
-    {% for column in row %}
-        <td>{{ column }}</td>
-    {% endfor %}
-  </tr>
-{% endfor %}
-</table>
+  <br>{{ mfoo | abs }}
 
-<br>=====<br>
-{% set items = [{ 'fruit' : 'apple'}, {'orange': 'fruit' }, {'fruit': 'dragon' }] %}
-{% set fruits = items|column('fruit') %}
-{{ fruits | json_encode }}
+  <br>=====<br>
+  {% set items = ['a', 'b', 'c', 'd','e'] %}
+  <table border="1">
+  {% for row in items|batch(2, 'No item',false) %}
+    {{ row | json_encode }}<br>---<br>
+    <tr>
+      {% for column in row %}
+          <td>{{ column }}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </table>
+
+  <br>=====<br>
+  {% set items = [{ 'fruit' : 'pineapple'},{ 'fruit' : 'apple'}, {'fruit': 'orange' }, {'fruit': 'dragon' }] %}
+  {% set fruits = items|column('fruit') %}
+  {{ fruits | json_encode }}
+
+  <br>=====<br>
+  {# France #}
+  {{ 'US'|country_name('fr') }} | {{ 'cz'|country_name('gu') }} | {{ 'US'|country_name('or') }} | {{ 'AU'|country_name('ar') }} | {{ 'CZ'|country_name('hi') }}
+  <br>
+  {{ 'EUR'|currency_name }} | {{ 'INR'|currency_name('gu') }} | {{ 'AUD'|currency_name('hi') }} | {{ 'RUB'|currency_name }}
+  <br>
+  {{ 'EUR'|currency_symbol }} | {{ 'INR'|currency_symbol('gu') }} | {{ 'AUD'|currency_symbol('hi') }} | {{ 'RUB'|currency_symbol }}
+
+  <br>=====<br>
+  {{ '<b>foobar</b>' | data_uri }} <hr>
+  {{ '<a href="google.com">foobar</a>' | data_uri }}
+
+  <br>=======<br>
+   {% set post = { published_at: '23-01-1990 13:34:35'} %}
+   {{ "now" | date('d.m.Y h:i a', false) }} <br>
+    {{ post.published_at|date_modify("+1 year")|date("m/d/y") }}
+  <br>======<br>
+  {{ e_post | default('e_post is not defined') }}
+  <br>
+  {{ 'this is <script> alert("fff")</script>' | e }}
+  <br>===<br>
+
+  {% apply html_to_markdown({hard_break: false}) %}
+      <html>
+          <h1>Hello!</h1>
+      </html>
+  {% endapply %}
+
+  <br>===<br>
+  {{ items|column('fruit') | join(',',' and ') }}
+  <br>===<br>
+  {% set items2 = {'nik': 'jon','james': 'nicolet'} %}
+  {% for key in items2|keys %}
+        {{ key }},
+  {% endfor %}
+  <br>===<br>
+  {{ "I like %c and %s."|format("83", "bar") }}
+  <br>===<br>
+  {{ "I like this and this is that." | replace({'this': 'foo', 'that': "bar"}) }}
+  {{ '1000000'|format_currency('INR') }}
+  <br>===<br>
+  {{ items2 | map((value, key) => "#{key} #{value}")|join(', ') }}
+  <br>===<br>
+  {% set itm = items2|merge({'william': 'smit'}) %}
+  {{ itm | json_encode }}
+  <br>===<br>
+  {{ itm | reverse | json_encode }}
+  <br>===<br>
+  {{ itm | slice(1,2) | json_encode }}
+  <br>==<br>
+  {{
+      "<div>
+          <strong>foo</strong>
+      </div>
+      " | e | spaceless }}
+  <br>====<br>
+
+  {{ itm | sort | join('|') }}
+
+  <br>====<br>
+  {% set newar = '1,2,3,4' | split(',', 2) %}
+  {{ newar | json_encode }}
+
+  {{ 'My name is<br> <b>smp</b>'|striptags('<br><b>') }}
+  <br>==<br>
+  {{ ' .my_firs-car. ' | u.upper.snake }}
+  <br>==<br>
+  {% for x in 0..3 %}
+      {{ cycle(items,x) | json_encode }}<br>
+  {% endfor %}
+
+  {% set tims =  date('24-05-2022') %}
+
+  {{ tims | json_encode  }}
+  <br>====<br>
+  {{ country_timezones('RU') | join("<br>") | raw }}
+  <br>
+  {{ items[0]['fruit'] }} {# printing array value by index 1D,2D by two indexes/key  #}
+  {% if tims is iterable %}
+      ~~YES
+  {% endif %}
+
+
+{% endif %} {# yes show all varible by master page #}
+<br>== CUSTOM FILTER1 ==<br>
+
+{{ 'Hosing  @ SMP.8.aum' | disp_dot_spell([false,'28']) }}
+
+<br>== CUSTOM FUNCTION ==<br>
+{{ sum_of_arr([1,2,3]) }}
